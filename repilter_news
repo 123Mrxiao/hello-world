@@ -1,0 +1,42 @@
+# -*- encoding="utf-8" -*-
+# 开发者 ： 肖凯旋
+# time : 2019/08/29;23:52
+"""
+环球时报每日新闻文章爬虫
+"""
+
+import requests
+import UserAgent
+from bs4 import BeautifulSoup
+
+url = "http://www.haolinjushare.cn/m/default/list"
+headers = {'User-Agent': UserAgent.USERAGENT()}
+parameters = {
+    'page': '3',
+    'page_size': '10',
+    'cat_id': '0',
+    'down_id': '40161',
+    }
+res = requests.get(url, headers=headers, params=parameters)
+js_res = res.json()
+dict_res = js_res["data"]["data"]
+
+i = 0
+for item in dict_res:
+    news_link = item["desc"]+": "+item["detail_url"]
+    print(news_link)
+    res_link = requests.get(item["detail_url"], headers=headers)
+
+    bs_res_link = BeautifulSoup(res_link.text, "html.parser")
+    # print(bs_res_link)
+    # print("title : "+bs_res_link.find("h1", class_="title").text)
+    # print(bs_res_link.find("div", class_="article-src-time").text)
+    find_bs_res = bs_res_link.find_all("p")
+    # print(find_bs_res)
+    for article in find_bs_res[:-6]:
+        # print(article.text)
+        with open("./news/环球时报新闻"+str(i)+".txt", "a+", encoding="utf-8") as f:
+            f.write(article.text+"\n")
+    i += 1
+    if i == 2:
+        break
