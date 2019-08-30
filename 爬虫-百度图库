@@ -1,0 +1,83 @@
+# -*- encoding="utf-8" -*-
+# -*- 2019/08/28;17:01-*-
+# 开发者 ： XiaoKaiXuan
+
+import requests
+from urllib.request import quote
+import random
+# word = "猫和老鼠头像"
+# quote_word = quote(word)
+# print(quote_word)
+
+number = 0
+def funtion(value1):
+
+    while True:
+
+        global number
+        number += 30
+
+        if number == 90:
+            break
+
+        url = "https://image.baidu.com/search/index"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"}
+        parameters = {
+                        'tn': 'resultjson_com',
+                        'ipn': 'rj',
+                        'ct': '201326592',
+                        'is': "",
+                        'fp': 'result',
+                        'queryWord': value1,
+                        'cl': '2',
+                        'lm': '-1',
+                        'ie': 'utf-8',
+                        'oe': 'utf-8',
+                        'adpicid': "",
+                        'st': '-1',
+                        'z': "",
+                        'ic': '0',
+                        'hd': "",
+                        'latest': "",
+                        'copyright': "",
+                        'word': value1,
+                        's': "",
+                        'se': "",
+                        'tab': "",
+                        'width': "",
+                        'height': "",
+                        'face': '0',
+                        'istype': '2',
+                        'qc': "",
+                        'nc': '1',
+                        'fr': "",
+                        'expermode': "",
+                        'force': "",
+                        'pn': number,
+                        'rn': '30',
+                        'gsm': "",
+                        '1566987421627': "",
+                    }
+        print("正在搜索 "+value1+" 相关的url...")
+        res = requests.get(url, headers=headers, params=parameters)
+        js_res = res.json()
+        list_res = js_res["data"]
+
+        for i in list_res:
+            try:
+                photo_link = i["thumbURL"]
+                print("正在抓取："+photo_link)
+                download = requests.get(photo_link,timeout=10)
+                f = open("./photo/"+keyword+"_"+str(random.randrange(0,10000,4))+".jpg","wb")
+                f.write(download.content)
+                f.close()
+
+            except KeyError:
+                print("第一页结束")
+
+
+if __name__ == "__main__":
+    keyword = input("输入你要爬取的图片关键字：")
+    funtion(keyword)
+
